@@ -1,3 +1,4 @@
+# this script will upload a file to an s3 bucket using boto3
 import os
 import boto3
 from botocore.exceptions import ClientError
