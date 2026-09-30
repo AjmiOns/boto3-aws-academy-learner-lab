@@ -1,3 +1,4 @@
+# this script will download a file from an s3 bucket using boto3
 import boto3
 from botocore.exceptions import ClientError
  
