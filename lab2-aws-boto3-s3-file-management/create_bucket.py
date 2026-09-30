@@ -1,3 +1,4 @@
+# this script will create a new s3 bucket using boto3
 import boto3
 from botocore.exceptions import ClientError
  
