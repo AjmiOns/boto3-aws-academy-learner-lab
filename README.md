@@ -37,6 +37,7 @@ flowchart LR
     B --> EC2["EC2<br/>instances and regions"]
 ```
 
+
 ## Labs
 
 | Lab | Folder | Services | Deliverable | Key pattern | Statement |
