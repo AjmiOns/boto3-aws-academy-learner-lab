@@ -1,9 +1,11 @@
+#This script creates a Lambda function using the AWS SDK for python (boto3)
 import boto3
 import io
 import zipfile
 
 sts = boto3.client("sts")
 lambda_client = boto3.client("lambda")
+
 
 account = sts.get_caller_identity()["Account"]
 role_arn = f"arn:aws:iam::{account}:role/LabRole"
@@ -23,4 +25,4 @@ response = lambda_client.create_function(
     Code={"ZipFile": package_bytes},
 )
 
-print(response)
+print(response)  
