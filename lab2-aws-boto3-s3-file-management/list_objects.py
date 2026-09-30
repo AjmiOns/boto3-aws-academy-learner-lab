@@ -1,3 +1,4 @@
+# this script will list the objects in an s3 bucket using boto3
 import boto3
 from botocore.exceptions import ClientError
  
