@@ -1,3 +1,4 @@
+# this script will generate a presigned url for an s3 object using boto3
 import boto3
 from botocore.exceptions import ClientError
  
