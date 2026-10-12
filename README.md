@@ -45,6 +45,7 @@ flowchart LR
 | 0 | [`lab0-aws-environment-setup`](./lab0-aws-environment-setup) | STS | Working environment and connection test | Temporary credentials | [PDF](./lab0-aws-environment-setup/enonce/lab0_enonce.pdf) |
 | 1 | [`lab1-aws-boto3-fundamentals`](./lab1-aws-boto3-fundamentals) | STS, S3, EC2 | `aws_resource_explorer.py` | Clients vs resources | [PDF](./lab1-aws-boto3-fundamentals/enonce/lab1_enonce.pdf) |
 | 2 | [`lab2-aws-boto3-s3-file-management`](./lab2-aws-boto3-s3-file-management) | S3 | `s3_manager.py` | Paginators | [PDF](./lab2-aws-boto3-s3-file-management/enonce/lab2_enonce.pdf) |
+| 3 | [`lab3-EC2-manager`](./lab3-EC2-manager) | EC2 | `ec2_manager.py` | Waiters | [PDF](./lab3-EC2-manager/enonce/lab3_enonce.pdf) |
 
 ### Lab 0: Environment setup
 
@@ -77,6 +78,18 @@ A menu-driven CLI for buckets and objects.
 | 8 | Delete bucket | Typed confirmation, guidance on `BucketNotEmpty` |
 | 9 | Backup local folder | Recursive upload that preserves the folder structure as key prefixes |
 
+### Lab 3: EC2 Manager
+
+A command-line tool that manages the full lifecycle of an EC2 instance.
+
+- Launches a `t3.micro` instance with the `vockey` key pair.
+- Lists instances with their state, type and public IP, tolerating untagged instances.
+- Starts, stops and terminates instances by ID.
+- Uses **waiters** (`instance_running`, `instance_stopped`, `instance_terminated`) instead of `time.sleep()` polling.
+- Asks for typed confirmation before terminating, and gives clear messages for `UnauthorizedOperation` and `InvalidInstanceID.NotFound`.
+
+> The standalone `launch_instance.py` was folded into `ec2_manager.py`.
+
 ## Repository structure
 
 ```text
@@ -89,6 +102,9 @@ boto3-aws-academy-learner-lab/
 ├── lab2-aws-boto3-s3-file-management/
 │   ├── s3_manager.py
 │   └── enonce/lab2_enonce.pdf
+├── lab3-EC2-manager/
+│   ├── ec2_manager.py
+│   └── enonce/lab3_enonce.pdf
 ├── requirements.txt
 ├── .gitignore
 ├── LICENSE
@@ -104,7 +120,7 @@ boto3-aws-academy-learner-lab/
 ## Quick start
 
 ```bash
-git clone https://github.com/<your-username>/boto3-aws-academy-learner-lab.git
+git clone https://github.com/AjmiOns/boto3-aws-academy-learner-lab.git
 cd boto3-aws-academy-learner-lab
 
 python -m venv venv
@@ -159,6 +175,9 @@ python lab1-aws-boto3-fundamentals/aws_resource_explorer.py
 
 # Lab 2: manage S3 interactively
 python lab2-aws-boto3-s3-file-management/s3_manager.py
+
+# Lab 3: manage the EC2 lifecycle
+python lab3-EC2-manager/ec2_manager.py
 ```
 
 <details>
@@ -206,12 +225,13 @@ report.csv                                                8,940  2026-09-01 10:5
 
 | Practice | Why it matters | Where |
 |----------|----------------|-------|
-| Branch on `e.response["Error"]["Code"]`, never on the message | Codes are a stable contract; messages are reworded by AWS | Labs 1, 2 |
+| Branch on `e.response["Error"]["Code"]`, never on the message | Codes are a stable contract; messages are reworded by AWS | Labs 1, 2, 3 |
 | Use paginators for listings | `list_objects_v2` returns at most 1000 keys per call | Lab 2 |
-| Read optional fields with `.get()` | Untagged instances and empty buckets omit keys entirely | Labs 1, 2 |
+| Use waiters instead of `sleep` | Waiters poll the real state and stop as soon as it is reached | Lab 3 |
+| Read optional fields with `.get()` | Untagged instances and empty buckets omit keys entirely | Labs 1, 2, 3 |
 | Validate local input before calling AWS | A local mistake should not become an AWS error | Lab 2 |
-| Require typed confirmation for destructive actions | A deliberate act prevents reflexive deletions | Lab 2 |
-| Re-raise unknown errors | Swallowing unexpected failures hides real bugs | Labs 1, 2 |
+| Require typed confirmation for destructive actions | A deliberate act prevents reflexive deletions | Labs 2, 3 |
+| Re-raise unknown errors | Swallowing unexpected failures hides real bugs | Labs 1, 2, 3 |
 | Normalise path separators to `/` in S3 keys | On Windows a backslash would create one oddly named object | Lab 2 |
 | Clean up after every session | Idle resources consume the shared budget | All labs |
 
@@ -263,6 +283,8 @@ git ls-files | grep -iE "credentials|\.pem|\.env"
 | `NoCredentialsError` | Boto3 found no credentials | Check the path and spelling of `~/.aws/credentials` |
 | `NoRegionError` | No region resolved | Add `region = us-east-1` to `~/.aws/config` |
 | `UnauthorizedOperation` | Forbidden instance type or region | Use `t3.micro` in `us-east-1` |
+| `InvalidInstanceID.NotFound` | Wrong instance ID, or wrong region | Check the ID with the list option and confirm the region |
+| `WaiterError` | Instance did not reach the expected state in time | Check its state in the console, then retry |
 | `BucketAlreadyExists` | Name owned by another account | Add a personal prefix |
 | `BucketNotEmpty` | Objects still inside | Delete every object, then the bucket |
 | `KeyError: 'Tags'` or `'Contents'` | Optional key absent | Use `.get("...", [])` |
@@ -285,7 +307,7 @@ Run through this before closing your laptop:
 - [x] Lab 0: environment setup and connection test
 - [x] Lab 1: Boto3 fundamentals, clients vs resources
 - [x] Lab 2: S3 file manager with paginators
-- [ ] Lab 3: EC2 lifecycle with waiters
+- [x] Lab 3: EC2 lifecycle with waiters
 - [ ] Lab 4: DynamoDB tables and conditional writes
 - [ ] Lab 5: Lambda deployment with `LabRole`
 - [ ] Shared toolkit module (logging, retries, configuration) reused across labs
@@ -300,8 +322,8 @@ Run through this before closing your laptop:
 Ons Ajmi
 Cloud Infrastructure Management Engineering Student at TEK-UP University, Tunisia.
 
-🐙 GitHub:(https://github.com/<your-username>)  
-💼 LinkedIn:(https://www.linkedin.com/in/<your-profile>)
+🐙 GitHub: [AjmiOns](https://github.com/AjmiOns)  
+💼 LinkedIn: [Ons Ajmi](https://www.linkedin.com/in/ons-ajmi--)
 
 ## License
 
